@@ -23,11 +23,8 @@ const getPhones = () => {
 };
 
 const getPhonesDetails = (phones) => {
-  const gottenList = phones.map(phone => {
-    const id = phone.id;
-
-    return fetch(`${detailsUrl}${id}.json`);
-  });
+  const gottenList = phones.map(phone =>
+    fetch(`${detailsUrl}${phone.id}.json`));
 
   return Promise.all(gottenList);
 };
