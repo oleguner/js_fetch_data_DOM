@@ -8,39 +8,36 @@ const detailsUrl
 const getPhones = () => {
   return new Promise((resolve, reject) => {
     fetch(listUrl)
-      .then(response => response.json())
-      .then(result => {
-        resolve(result);
+      .then(response => resolve(response.json()));
 
-        if (!result) {
-          setTimeout(
-            () => reject(new Error('Response was rejected'),
-              5000),
-          );
-        }
-      });
+    setTimeout(
+      () => reject(new Error('Response was rejected'),
+        5000,
+      ));
   });
 };
 
-const getPhonesDetails = (phones) => {
-  const gottenList = phones.map(phone =>
-    fetch(`${detailsUrl}${phone.id}.json`));
+const createPhonesList = (phones) => {
+  const phonesList = document.createElement('ul');
 
-  return Promise.all(gottenList);
+  document.body.append(phonesList);
+
+  phonesList.insertAdjacentHTML(
+    'afterbegin',
+    `${phones.map(phone => `<li>${phone.name}</li>`).join('')}`,
+  );
+
+  return phones;
+};
+
+const getPhonesDetails = (ids) => {
+  const phonesDetails = ids.map(id => fetch(`${detailsUrl}${id}.json`));
+
+  return Promise.all(phonesDetails);
 };
 
 getPhones()
-  .then((response) => {
-    const phonesList = document.createElement('ul');
-
-    document.body.append(phonesList);
-
-    phonesList.insertAdjacentHTML(
-      'afterbegin',
-      `${response.map(phone => `<li>${phone.name}</li>`).join('')}`,
-    );
-
-    return response;
-  })
+  .then(createPhonesList)
+  .then(phones => phones.map(phone => phone.id))
   .then(getPhonesDetails)
   .catch(new Error('Something went wrong'));
